@@ -1,0 +1,9 @@
+[project]
+name = "sitepulse"
+version = "0.1.0"
+readme = "README.md"
+authors = [
+    { name = "Jim Massey", email = "jim.massey@etika.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
