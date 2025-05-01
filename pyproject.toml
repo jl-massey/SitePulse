@@ -6,4 +6,12 @@ authors = [
     { name = "Jim Massey", email = "jim.massey@etika.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "beautifulsoup4>=4.13.4",
+    "matplotlib>=3.10.1",
+    "nltk>=3.9.1",
+    "requests>=2.32.3",
+    "scikit-learn>=1.6.1",
+    "streamlit>=1.45.0",
+    "wordcloud>=1.9.4",
+]
