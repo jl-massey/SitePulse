@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-from typing import Dict
 
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
@@ -38,13 +37,13 @@ def generate_wordclouds(business_url: str) -> None:
 
     try:
         with open(file_a, "r", encoding="utf-8") as f:
-            tfidf_a: Dict[str, float] = json.load(f)
+            tfidf_a: dict[str, float] = json.load(f)
     except FileNotFoundError:
         logging.error("TF-IDF file not found: %s", file_a)
         raise
     try:
         with open(file_b, "r", encoding="utf-8") as f:
-            tfidf_b: Dict[str, float] = json.load(f)
+            tfidf_b: dict[str, float] = json.load(f)
     except FileNotFoundError:
         logging.error("TF-IDF file not found: %s", file_b)
         raise
@@ -72,7 +71,7 @@ def generate_wordclouds(business_url: str) -> None:
         logging.info("Saved word cloud %s", paths[key])
 
 
-def _create_wordcloud(tfidf_dict: Dict[str, float]) -> WordCloud:
+def _create_wordcloud(tfidf_dict: dict[str, float]) -> WordCloud:
     # Internal: create a WordCloud object from term-score pairs
     wc = WordCloud(
         width=IMAGE_SIZE[0],
@@ -84,10 +83,10 @@ def _create_wordcloud(tfidf_dict: Dict[str, float]) -> WordCloud:
     return wc
 
 
-def _compute_difference(a: Dict[str, float], b: Dict[str, float], threshold: float = 0.01) -> Dict[str, float]:
+def _compute_difference(a: dict[str, float], b: dict[str, float], threshold: float = 0.01) -> dict[str, float]:
     # Internal: compute significant differences between TF-IDF scores
     # Only include terms that are unique to A or where A's score is at least 4x B's
-    diff: Dict[str, float] = {}
+    diff: dict[str, float] = {}
     for term, score_a in a.items():
         score_b = b.get(term, 0.0)
         if score_b < 0:

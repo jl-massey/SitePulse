@@ -147,29 +147,44 @@ def main() -> None:
                 "difference": os.path.join(OUTPUT_DIR, f"wc-{prefix}-diff.png")
             }
 
-            # Create three columns for word clouds
-            col1, col2, col3 = st.columns(3, gap="medium")
-
-            with col1:
-                st.subheader("Your Topics")
+            # Side-by-side comparison section
+            st.write("### Topic Comparison")
+            comparison_cols = st.columns([1, 1])
+            
+            with comparison_cols[0]:
+                st.write("#### You")
                 if os.path.exists(paths["business"]):
-                    st.image(paths["business"], use_container_width=True)
+                    st.image(
+                        paths["business"],
+                        use_container_width="always",
+                        output_format="PNG"
+                    )
                 else:
                     st.error("Business word cloud not generated")
 
-            with col2:
-                st.subheader("Competitor Topics")
+            with comparison_cols[1]:
+                st.write("#### Competitors")
                 if os.path.exists(paths["competitors"]):
-                    st.image(paths["competitors"], use_container_width=True)
+                    st.image(
+                        paths["competitors"],
+                        use_container_width="always",
+                        output_format="PNG"
+                    )
                 else:
                     st.error("Competitor word cloud not generated")
 
-            with col3:
-                st.subheader("Unique Topics")
-                if os.path.exists(paths["difference"]):
-                    st.image(paths["difference"], use_container_width=True)
-                else:
-                    st.error("Difference word cloud not generated")
+            # Unique topics section (centered below)
+            st.write("### You Have More")
+            if os.path.exists(paths["difference"]):
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    st.image(
+                        paths["difference"],
+                        use_container_width="always",
+                        output_format="PNG"
+                    )
+            else:
+                st.error("Difference word cloud not generated")
 
         except Exception as e:
             st.error(

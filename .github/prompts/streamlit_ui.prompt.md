@@ -8,7 +8,7 @@ Build a Streamlit app to input URLs and display word clouds for SitePulse.
 ## Instructions
 - Use `streamlit` to create a web UI.
 - Features:
-  - Input fields for business URL (A) and multiple competitor URLs (B).
+  - Input fields for business name, business URL (A) and multiple competitor URLs (B).
   - One button to trigger scraping, TF-IDF, and word cloud generation.
   - Display three word clouds (`wc-www_businessA_com.png`, `wc-www_businessA_com-competitors.png`, `wc-www_businessA_com-diff.png`) from `./output/`.
 - Layout: Clean, centered, with headings for “Business”, “Competitors”, “Difference”.
