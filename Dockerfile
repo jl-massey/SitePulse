@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
 
 RUN git clone https://github.com/jl-massey/SitePulse.git
 
+# Change to the cloned repository directory before installing requirements
+WORKDIR /app/SitePulse
+
 RUN pip3 install -r requirements.txt
 
 EXPOSE 8501
