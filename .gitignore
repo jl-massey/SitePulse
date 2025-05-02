@@ -12,5 +12,6 @@ wheels/
 data/*
 output/*
 
+# Ignore .github and .vscode directories
 .github/
 .vscode/
