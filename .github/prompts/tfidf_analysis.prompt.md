@@ -7,12 +7,12 @@ Compute TF-IDF scores for text from business (A) and competitors (B) to identify
 
 ## Instructions
 - Use `scikit-learn`’s `TfidfVectorizer` for TF-IDF analysis.
-- Input: `site-www_businssA_com.txt` and all competitors (`site-www_businessB1_com.txt`, `site-www_businessB2_com.txt`, etc.) from `./data/`.
+- Input: `site-www_businssA_com.txt`, all competitors (`site-www_businessB1_com.txt`, `site-www_businessB2_com.txt`, etc.) from `./data/`, and a list of custom "stop words".
     - If an input file does not contain useful information, delete it and try to scrape the site again.
     - Treat all competitors as a single group (B).
 - Preprocess:
     - lowercase, remove stop words (use NLTK’s English stop words), and tokenize. If this is built in to the `TfidfVectorizer`, you can skip this step.
-    - remove all references to the business name as provided from the UI.
+    - remove all references to the filtered words as provided from the UI.
 - Generate TF-IDF matrices for A and B separately.
 - Extract top 100 terms by TF-IDF score for each.
 - Output: Two JSON files (`tfidf-www_businessA_com.json`, `tfidf-www_businessA_com-competitors.json`) with term-score pairs.

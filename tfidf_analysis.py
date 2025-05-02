@@ -17,62 +17,26 @@ nltk.download('punkt', quiet=True)
 DATA_DIR = "data"
 TOP_N = 100
 
-def _get_business_terms(name: str | None = None, url: str | None = None) -> set[str]:
-    """Build set of business terms to filter from texts."""
-    terms = set()
-    
-    # Add terms from provided name if available
-    if name:
-        # Tokenize and clean name
-        tokens = word_tokenize(name.lower())
-        # Add individual words and pairs
-        for token in tokens:
-            if token.isalpha() and token not in stopwords.words('english'):
-                terms.add(token)
-        # Add word pairs without punctuation or stopwords
-        clean_tokens = [t for t in tokens if t.isalpha() and t not in stopwords.words('english')]
-        for i in range(len(clean_tokens)-1):
-            terms.add(f"{clean_tokens[i]} {clean_tokens[i+1]}")
-            terms.add(f"{clean_tokens[i]}{clean_tokens[i+1]}")
-    
-    # Extract terms from URL as backup
-    if url:
-        from urllib.parse import urlparse
-        domain = urlparse(url).netloc.lower()
-        # Strip www. and TLD
-        name = domain.replace('www.', '').split('.')[0]
-        # Split on non-letters and add parts
-        parts = ''.join(c if c.isalpha() else ' ' for c in name).split()
-        terms.update(p for p in parts if p not in stopwords.words('english'))
-        # Add the full domain name too
-        domain_name = ''.join(c for c in name if c.isalpha())
-        if domain_name:
-            terms.add(domain_name)
-            
-    return terms
-
-def compute_tfidf(business_url: str, competitor_urls: list[str], business_name: str | None = None) -> None:
+def compute_tfidf(business_url: str, competitor_urls: list[str], filter_words: list[str] | None = None) -> None:
     """
     Compute TF-IDF scores for business and competitor websites.
     
-    Processes website content, removes business name references, and generates 
+    Processes website content, removes specified filter words, and generates 
     TF-IDF scores. Treats all competitors as a single group. Outputs top terms 
-    by score as JSON. If business_name is not provided, extracts it from URL.
+    by score as JSON.
     
     Args:
         business_url: URL of the business website
         competitor_urls: List of competitor website URLs
-        business_name: Optional business name to filter from analysis
+        filter_words: Optional list of words to filter from analysis
     """
     data_dir = Path(DATA_DIR)
     data_dir.mkdir(exist_ok=True)
     
-    # Get business terms to filter out
-    business_terms = _get_business_terms(business_name, business_url)
-    if not business_terms:
-        logging.warning("No business terms identified for filtering")
-    else:
-        logging.info("Business terms to filter: %s", sorted(business_terms))
+    # Prepare filter words set (lowercase)
+    custom_filter_words = set(filter_words) if filter_words else set()
+    if custom_filter_words:
+        logging.info("Custom words to filter: %s", sorted(custom_filter_words))
         
     # Load and preprocess business text
     business_prefix = url_to_filename(business_url)
@@ -90,9 +54,9 @@ def compute_tfidf(business_url: str, competitor_urls: list[str], business_name: 
         text = ''.join(c for c in text if c.isalpha() or c.isspace())
         # Tokenize
         tokens = word_tokenize(text)
-        # Remove stopwords and business terms
+        # Remove stopwords and custom filter words
         stop_words = set(stopwords.words('english'))
-        tokens = [t for t in tokens if t not in stop_words and t not in business_terms]
+        tokens = [t for t in tokens if t not in stop_words and t not in custom_filter_words]
         
         if not tokens:
             business_path.unlink()  # Delete if no valid content remains
@@ -123,7 +87,7 @@ def compute_tfidf(business_url: str, competitor_urls: list[str], business_name: 
             # Same preprocessing as business text
             text = ''.join(c for c in text if c.isalpha() or c.isspace())
             tokens = word_tokenize(text)
-            tokens = [t for t in tokens if t not in stop_words and t not in business_terms]
+            tokens = [t for t in tokens if t not in stop_words and t not in custom_filter_words]
             
             if tokens:
                 competitor_texts.append(' '.join(tokens))
@@ -213,9 +177,10 @@ if __name__ == "__main__":
         help="Competitor website URLs"
     )
     parser.add_argument(
-        "--business-name",
-        required=False,
-        help="Optional business name to filter from analysis"
+        "--filter-words",
+        nargs="*", # Accept zero or more words
+        default=[],
+        help="Optional list of words to filter from analysis"
     )
     args = parser.parse_args()
-    compute_tfidf(args.business_url, args.competitors, args.business_name)
+    compute_tfidf(args.business_url, args.competitors, args.filter_words)
