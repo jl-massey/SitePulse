@@ -6,10 +6,12 @@ mode: 'agent'
 Scrape text content from a business website (A) and a list of competitor websites (B) using Python.
 
 ## Instructions
-- Use `requests` and `beautifulsoup4` to fetch and parse HTML.
+- Use `httpx` and `beautifulsoup4` for asynchronous HTTP requests and HTML parsing.
 - Input: URL for business site (A) and a list of competitor URLs (B).
 - Extract text from `<p>`, `<h1>`, `<h2>`, `<h3>`, and `<div>` tags, ignoring scripts, styles, and navigation menus.
 - Limit naviation depth to 2 levels.
+- Prioritize speed and efficiency for scraping. Avoid any non-text elements unless it's a SPA.  Be impatient and aggressive.
+- The landing page and any 'about us', 'about', 'who we are', etc. pages are priority.
 - Clean text: remove extra whitespace, special characters, and non-alphanumeric content.
 - Output: Site text in text files (`site-www_businessA_com.txt`, `site-www_businessB1_com.txt`, `site-www_businessB2_com.txt`) with cleaned text.
 - If a file exists for a site, do not rescrape it.
