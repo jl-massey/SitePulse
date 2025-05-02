@@ -13,6 +13,7 @@ from scrape_websites import url_to_filename
 # Download required NLTK data
 nltk.download('stopwords', quiet=True)
 nltk.download('punkt', quiet=True)
+nltk.download('punkt_tab', quiet=True)
 
 DATA_DIR = "data"
 TOP_N = 100
