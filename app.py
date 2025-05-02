@@ -17,7 +17,8 @@ class WordCloudPaths(TypedDict):
     """Type definition for word cloud image paths."""
     business: str  # Your website topics
     competitors: str  # Competitor topics
-    difference: str  # Unique topics
+    diff_more: str  # Topics you have more (A-B)
+    diff_less: str  # Topics competitors favor (B-A)
 
 # Prevent gio browser launch error on Linux
 if platform.system() == "Linux":
@@ -61,19 +62,11 @@ def main() -> None:
     # Business section
     with st.container():
         st.subheader("Your Business")
-        col1, col2 = st.columns([1, 2])
-        with col1:
-            business_name = st.text_input(
-                "Business Name",
-                placeholder="Example Inc",
-                help="Used to filter business-specific terms from analysis"
-            )
-        with col2:
-            business_url = st.text_input(
-                "Website URL",
-                placeholder="https://www.example.com",
-                help="Your company's website address"
-            )
+        business_url = st.text_input(
+            "Website URL",
+            placeholder="https://www.example.com",
+            help="Your company's website address"
+        )
 
     # Competitor section
     st.subheader("Competitors")
@@ -85,6 +78,14 @@ def main() -> None:
             "https://www.competitor2.com"
         ),
         help=f"Maximum {MAX_COMPETITORS} competitors"
+    )
+
+    # Filter section
+    st.subheader("Filter")
+    filter_words_input = st.text_input(
+        "Words to remove from the cloud (comma delimited)",
+        placeholder="e.g., company, business, solution",
+        help="Enter words to exclude from the analysis, separated by commas."
     )
 
     # Process button
@@ -118,13 +119,9 @@ def main() -> None:
         if len(competitor_urls) > MAX_COMPETITORS:
             st.error(f"Please enter no more than {MAX_COMPETITORS} competitor URLs.")
             return
-
-        # Show warning if business name not provided
-        if not business_name:
-            st.warning(
-                "Business name not provided. This may affect analysis accuracy "
-                "as business-specific terms might not be filtered correctly."
-            )
+        
+        # Process filter words
+        filter_words = [word.strip().lower() for word in filter_words_input.split(',') if word.strip()]
 
         try:
             # Content collection
@@ -133,7 +130,7 @@ def main() -> None:
 
             # Analysis
             with st.spinner("🔍 Analyzing content differences..."):
-                compute_tfidf(business_url, competitor_urls, business_name)
+                compute_tfidf(business_url, competitor_urls, filter_words) 
 
             # Visualization
             with st.spinner("🎨 Creating visualizations..."):
@@ -144,15 +141,16 @@ def main() -> None:
             paths: WordCloudPaths = {
                 "business": os.path.join(OUTPUT_DIR, f"wc-{prefix}.png"),
                 "competitors": os.path.join(OUTPUT_DIR, f"wc-{prefix}-competitors.png"),
-                "difference": os.path.join(OUTPUT_DIR, f"wc-{prefix}-diff.png")
+                "diff_more": os.path.join(OUTPUT_DIR, f"wc-{prefix}-diff_more.png"), # A-B
+                "diff_less": os.path.join(OUTPUT_DIR, f"wc-{prefix}-diff_less.png"), # B-A
             }
 
-            # Side-by-side comparison section
+            # --- Topic Comparison Section ---
             st.write("### Topic Comparison")
             comparison_cols = st.columns([1, 1])
             
             with comparison_cols[0]:
-                st.write("#### You")
+                st.write("#### You (A)")
                 if os.path.exists(paths["business"]):
                     st.image(
                         paths["business"],
@@ -163,7 +161,7 @@ def main() -> None:
                     st.error("Business word cloud not generated")
 
             with comparison_cols[1]:
-                st.write("#### Competitors")
+                st.write("#### Competitors (B)")
                 if os.path.exists(paths["competitors"]):
                     st.image(
                         paths["competitors"],
@@ -173,18 +171,31 @@ def main() -> None:
                 else:
                     st.error("Competitor word cloud not generated")
 
-            # Unique topics section (centered below)
-            st.write("### You Have More")
-            if os.path.exists(paths["difference"]):
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
+            # --- Difference Section ---
+            st.write("### Difference Analysis")
+            diff_cols = st.columns([1, 1])
+
+            with diff_cols[0]:
+                st.write("#### You Have More (A-B)")
+                if os.path.exists(paths["diff_more"]):
                     st.image(
-                        paths["difference"],
+                        paths["diff_more"],
                         use_container_width="always",
                         output_format="PNG"
                     )
-            else:
-                st.error("Difference word cloud not generated")
+                else:
+                    st.error("A-B difference word cloud not generated")
+
+            with diff_cols[1]:
+                st.write("#### Competitors Favor (B-A)")
+                if os.path.exists(paths["diff_less"]):
+                    st.image(
+                        paths["diff_less"],
+                        use_container_width="always",
+                        output_format="PNG"
+                    )
+                else:
+                    st.error("B-A difference word cloud not generated")
 
         except Exception as e:
             st.error(

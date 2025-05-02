@@ -17,7 +17,14 @@ Create word clouds for business (A), competitors (B), and difference (A - B) usi
     - For each term in a, subtract B's score (if B's score is < 0, use 0).
     - If the resulting score is negative or below threshold (e.g. 0.01), exclude the term.
     - Create a workd cloud with remaining terms, scaling font size by difference score.
-- Save word clouds as PNGs (`wc-www_businessA_com.png`, `wc-www_businessA_com-competitors.png`, `wc-www_businessA_com-diff.png`) in `./output/`.
+    - Save word cloud as PNG (`wc-www_businessA_com-diff_more.png`)
+- For B - A:
+    - Compute difference by comparing TF-IDF scores:
+        - Include a term in the different cloud only if:
+            - The term is in B but not in A (score=0 in A), or
+            - The term's TF-IDF score in B is SIGNIFICANTLY higher than in A (e.g.  B's score is at least 4x A's score).
+            - Save word cloud as PNG (`wc-www_businessA_com-diff_less.png`)
+- Save word clouds as PNGs (`wc-www_businessA_com.png`, `wc-www_businessA_com-competitors.png`, etc) in `./output/`.
 - Style: gray background, max 100 words
 - Handle file input errors.
 - Follow Python PEP 8, use snake_case.
