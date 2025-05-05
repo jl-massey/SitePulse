@@ -16,9 +16,9 @@ logging.basicConfig(
 )
 
 DATA_DIR = "data"
-MAX_REDIRECTS = 2
+MAX_REDIRECTS = 3
 MAX_RETRIES = 1
-PAGE_TIMEOUT = 5
+PAGE_TIMEOUT = 10
 
 # Priority paths to check first
 PRIORITY_PATHS = [""]
