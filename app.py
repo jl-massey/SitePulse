@@ -24,6 +24,26 @@ class WordCloudPaths(TypedDict):
 if platform.system() == "Linux":
     os.environ["GIO_EXTRA_MODULES"] = "/usr/lib/x86_64-linux-gnu/gio/modules/"
 
+
+def normalize_url(url: str) -> str:
+    """
+    Normalize a URL by ensuring it has a proper scheme (http:// or https://).
+    
+    Args:
+        url: The URL to normalize, with or without a scheme.
+        
+    Returns:
+        str: A URL with a proper scheme (uses https:// by default).
+    """
+    url = url.strip()
+    parsed = urlparse(url)
+    if parsed.scheme in ['http', 'https']:
+        return url
+    if url.startswith('//'):
+        return f"https:{url}"
+    return f"https://{url}"
+
+
 def is_valid_url(url: str) -> bool:
     """Validate URL format."""
     try:
@@ -31,6 +51,7 @@ def is_valid_url(url: str) -> bool:
         return all([result.scheme, result.netloc])
     except Exception:
         return False
+
 
 def main() -> None:
     """
@@ -97,19 +118,19 @@ def main() -> None:
     )
 
     if process:
-        # Input validation
         if not business_url:
             st.error("Please enter your business website URL.")
             return
+
+        business_url = normalize_url(business_url)
 
         if not is_valid_url(business_url):
             st.error("Please enter a valid business website URL.")
             return
 
-        # Process competitor URLs
         competitor_urls = [
-            url.strip() for url in competitor_input.splitlines() 
-            if url.strip() and is_valid_url(url.strip())
+            normalize_url(url.strip()) for url in competitor_input.splitlines() 
+            if url.strip() and is_valid_url(normalize_url(url.strip()))
         ]
 
         if not competitor_urls:

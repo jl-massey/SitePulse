@@ -22,4 +22,6 @@ COPY --from=builder --chown=app:app /app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
+WORKDIR /app
+
 CMD ["streamlit", "run", "app.py"]
